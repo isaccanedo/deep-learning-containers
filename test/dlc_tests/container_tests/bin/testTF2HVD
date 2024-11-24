@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -e
+
+INSTANCE_TYPE=$1
+if [ -z "$INSTANCE_TYPE" ];then
+  echo "Usage: "$0" <INSTANCE_TYPE>"
+  exit 1
+fi
+
+if [[ $INSTANCE_TYPE == g2* ]]; then
+  echo "This is g2* instance. Skipped."
+  exit 0
+fi
+
+HOME_DIR=/test
+BIN_DIR=${HOME_DIR}/bin
+LOG_DIR=${HOME_DIR}/logs
+
+if [[ $(python -c 'import tensorflow as tf; print(tf.__version__)') == 2.0.* ]]; then
+  pip install -U --no-deps tensorflow-addons==0.6.0
+elif [[ $(python -c 'import tensorflow as tf; print(tf.__version__)') == 2.1.* && $(python -c 'import sys; print(".".join(map(str, sys.version_info[:1])))') == 3 ]]; then
+  pip install -U --no-deps tensorflow-addons==0.9.0
+elif [[ $(python -c 'import tensorflow as tf; print(tf.__version__)') == 2.2.* ]]; then
+  pip install -U --no-deps tensorflow-addons==0.10.0
+else
+  pip install -U --no-deps tensorflow_addons
+fi
+pip install typeguard
+
+bash ${BIN_DIR}/testTF2HVDHelper INSTANCE_TYPE || exit 1
+
+echo "TF HVD tests passed!"
+exit 0

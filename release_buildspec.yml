@@ -1,0 +1,20 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - start-dockerd
+      - |
+        if expr "${ARCH_TYPE}" : "graviton" >/dev/null; then
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+        fi
+      - |
+        if expr "${ARCH_TYPE}" : "arm64" >/dev/null; then
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+        fi
+      - pip install -r src/requirements.txt
+  build:
+    commands:
+      - export PYTHONPATH=$PYTHONPATH:$(pwd)/src
+      - publish_dlc_images --release-spec $(pwd)/$RELEASE_IMAGE_FILE
+      - generate_release_information

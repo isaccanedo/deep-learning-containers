@@ -1,0 +1,33 @@
+botocore>1.0,<2.0
+boto3>1.0,<2.0
+awscli<2
+sagemaker>=2.180.0
+smdebug>=1
+sagemaker-experiments
+numpy
+scipy
+scikit-learn
+pandas
+Pillow
+h5py
+tox
+flake8
+# Preserve pytest caching behavior in earlier versions
+pytest<8.1
+pytest-cov
+pytest-rerunfailures
+pytest-xdist
+requests
+mock
+six
+python-dateutil>=2.1,<2.8.1
+requests-mock
+# test pipemode fails for 2.x containers with module 'tensorflow' has no attribute 'train'
+# without the below package
+tensorflow
+fabric
+invoke
+retrying==1.3.3
+tenacity
+gitpython
+toml

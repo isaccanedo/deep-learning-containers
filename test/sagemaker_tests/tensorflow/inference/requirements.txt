@@ -1,0 +1,15 @@
+boto3
+sagemaker
+# Preserve pytest caching behavior in earlier versions
+pytest<8.1
+pytest-rerunfailures
+pytest-timeout
+pytest-xdist
+requests
+fabric
+invoke
+retrying
+tenacity
+gitpython
+toml
+packaging

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+set -e
+
+HOME_DIR=/test
+BIN_DIR=${HOME_DIR}/bin
+LOG_DIR=${HOME_DIR}/logs
+
+TORCHDATA_BRANCH_DEFAULT="main"
+TORCHDATA_REPO="https://github.com/pytorch/data.git"
+TORCHDATA_TEST_SCRIPT="data/test/test_remote_io.py"
+
+echo "Fetch Torchdata S3 IO test script."
+TORCHDATA_RELEASE_TAG=$(python -c "import torchdata as td; print(td.__version__.split('+')[0])")
+git clone $TORCHDATA_REPO \
+    && pushd data \
+    && git checkout tags/v${TORCHDATA_RELEASE_TAG} -b ${TORCHDATA_RELEASE_TAG} \
+    && popd
+
+# removing awscli requirement as it should already be installed, and is causing dependency issues
+sed -i "s/awscli.*//g" data/test/requirements.txt
+# removing adlfs requirement as it is a library for Azure, and is causing dependency issues
+sed -i "s/adlfs.*//g" data/test/requirements.txt
+
+echo "Installing pre-requisites."
+pip install -r data/test/requirements.txt
+
+echo "Running Torchdata S3 IO datapipe tests."
+pytest data/test/test_remote_io.py
+
+if [ "$?" -eq "0" ]
+then
+    echo "Torchdata S3 IO tests succeeded."
+else
+    echo "Torchdata S3 IO tests failed at ${TORCHDATA_REPO} ${TORCHDATA_BRANCH} ${TORCHDATA_TEST_SCRIPT}"
+    exit 1
+fi
+
+exit 0
